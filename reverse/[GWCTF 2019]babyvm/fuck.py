@@ -1,0 +1,27 @@
+from z3 import *
+enc = [0x69, 0x45, 0x2A, 0x37, 0x09, 0x17, 0xC5, 0x0B, 0x5C, 0x72, 0x33, 0x76, 0x33, 0x21, 0x74, 0x31, 0x5F, 0x33, 0x73, 0x72]
+a,b,c = BitVecs('a b c',64)
+fucker = Solver()
+fucker.add((3*a+2*b+c)*0x33&0xff==0xc5)
+fucker.add((3*b+2*c+0x72)*0x33&0xff==0x0b)
+fucker.add((3*c+2*0x72+0x33)*0x33&0xff==0x5c)
+
+print(fucker.check())
+print(fucker.model())
+#[c = 95, b = 51, a = 118]
+enc[6] = 118
+enc[7] = 51
+enc[8] = 95
+
+for i in range(6):
+	enc[6-i-1] ^= enc[6-i]
+
+for i in range(3):
+	fuck = enc[13+i]
+	enc[13+i] = enc[19-i]
+	enc[19-i] = fuck
+
+flag = ''
+for i in enc:
+	flag += chr(i)
+print(flag)
